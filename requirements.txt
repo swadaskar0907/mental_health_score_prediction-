@@ -1,1 +1,5 @@
-print("name")
+fastapi
+uvicorn
+scikit-learn
+pandas
+numpy
