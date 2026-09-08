@@ -1,7 +1,7 @@
 fastapi
-uvicorn
-pandas
 pydantic
-joblib
-scikit-learn==1.3.2
+uvicorn
+joblib 
+pandas
+scikit-learn==1.6.1
 
