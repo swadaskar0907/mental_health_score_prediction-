@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="An AI-powered tool that estimates a mental health score from digital habits, academics, sleep, and lifestyle." />
+  <title>Mental Health Score Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- ===================== LANDING / HERO ===================== -->
+    <header class="hero" id="hero">
+      <canvas class="hero__field" id="heroField" aria-hidden="true"></canvas>
+      <div class="container hero__inner">
+        <span class="badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c.6 3.6 2.1 5.4 6 6-3.9.6-5.4 2.4-6 6-.6-3.6-2.1-5.4-6-6 3.9-.6 5.4-2.4 6-6Z"/></svg>
+          AI-Powered Prediction
+        </span>
+        <h1 class="hero__title">Mental Health <em>Score</em> Predictor</h1>
+        <p class="hero__subtitle">
+          Understand how your digital habits, lifestyle, academic routine, sleep,
+          physical activity, and stress may relate to your predicted mental health score.
+        </p>
+        <button type="button" class="btn btn--primary btn--lg" id="startBtn">
+          Start assessment
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+        </button>
+        <dl class="hero__stats">
+          <div><dt>3</dt><dd>quick steps</dd></div>
+          <div><dt>~2</dt><dd>minutes</dd></div>
+          <div><dt>12</dt><dd>data points</dd></div>
+        </dl>
+      </div>
+    </header>
+
+    <!-- ===================== WORKSPACE ===================== -->
+    <div class="app__workspace" id="workspace" hidden>
+      <div class="container">
+
+        <!-- ---------- Wizard card ---------- -->
+        <div class="wizard-card" id="wizardCard">
+
+          <div class="stepper" role="group" aria-label="Assessment progress">
+            <div class="stepper__meta">
+              <span id="stepperCount">Step 1 of 3</span>
+              <span class="stepper__meta-label" id="stepperLabel">Personal information</span>
+            </div>
+            <div class="stepper__track">
+              <div class="stepper__fill" id="stepperFill"></div>
+              <div class="stepper__node" id="node1" style="left:0%"><span class="sr-only">Personal information</span></div>
+              <div class="stepper__node" id="node2" style="left:50%"><span class="sr-only">Digital usage</span></div>
+              <div class="stepper__node" id="node3" style="left:100%"><span class="sr-only">Lifestyle & wellbeing</span></div>
+            </div>
+          </div>
+
+          <!-- Loading state (swapped in during submit) -->
+          <div class="loading-panel" id="loadingPanel" hidden role="status" aria-live="polite">
+            <div class="loading-panel__rings"><span></span><span></span><span></span></div>
+            <h2 class="loading-panel__title">Analyzing your responses…</h2>
+            <p class="loading-panel__subtitle">Our machine-learning model is generating your predicted score.</p>
+          </div>
+
+          <form id="wizardForm" novalidate>
+
+            <!-- Step 1: Personal Information -->
+            <section class="form-section" id="step1" data-step="1">
+              <div class="form-section__head">
+                <p class="form-section__eyebrow">Step 1 of 3</p>
+                <h2 class="form-section__title">Personal information</h2>
+                <p class="form-section__desc">A few basics to put your results in context.</p>
+              </div>
+              <div class="form-section__grid">
+
+                <div class="field">
+                  <label class="field__label" for="age">
+                    <span class="field__icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.4-4 4-6 7.5-6s6.1 2 7.5 6"/></svg></span>
+                    Age
+                  </label>
+                  <div class="field__control"><input type="number" id="age" name="age" min="0" max="100" placeholder="e.g. 21" /></div>
+                  <p class="field__error" id="age-error" role="alert" hidden></p>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="gender">
+                    <span class="field__icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.4-4 4-6 7.5-6s6.1 2 7.5 6"/></svg></span>
+                    Gender
+                  </label>
+                  <div class="field__control field__control--select">
+                    <select id="gender" name="gender">
+                      <option value="" disabled selected>Select…</option>
+                      <option value="Female">Female</option>
+                      <option value="Male">Male</option>
+                    </select>
+                  </div>
+                  <p class="field__error" id="gender-error" role="alert" hidden></p>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="country">
+                    <span class="field__icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.2 3.6 8.5s-1.2 6.2-3.6 8.5c-2.4-2.3-3.6-5.2-3.6-8.5S9.6 5.8 12 3.5Z"/></svg></span>
+                    Country
+                  </label>
+                  <div class="field__control">
+                    <input type="text" id="country" name="country" placeholder="Search for your country…" autocomplete="off" list="countryOptions" />
+                    <datalist id="countryOptions"></datalist>
+                  </div>
+                  <p class="field__error" id="country-error" role="alert" hidden></p>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="academic_level">
+                    <span class="field__icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5 2.5 9.5 12 14l9.5-4.5L12 5Z"/><path d="M6.5 11.8V16c0 1.4 2.5 2.7 5.5 2.7s5.5-1.3 5.5-2.7v-4.2"/></svg></span>
+                    Academic level
+                  </label>
+                  <div class="field__control field__control--select">
+                    <select id="academic_level" name="academic_level">
+                      <option value="" disabled selected>Select…</option>
+                      <option>Undergraduate</option>
+                      <option>Graduate</option>
+                      <option>High School</option>
+                    </select>
+                  </div>
+                  <p class="field__error" id="academic_level-error" role="alert" hidden></p>
+                </div>
+
+              </div>
+            </section>
+
+            <!-- Step 2: Digital Usage -->
+            <section class="form-section" id="step2" data-step="2" hidden>
+              <div class="form-section__head">
+                <p class="form-section__eyebrow">Step 2 of 3</p>
+                <h2 class="form-section__title">Digital usage</h2>
+                <p class="form-section__desc">How you spend time on your phone and social platforms.</p>
+              </div>
+              <div class="form-section__grid">
+
+                <div class="field">
+                  <label class="field__label" for="most_used_platform">
+                    <span class="field__icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.2"/><path d="M10.5 18.5h3"/></svg></span>
+                    Most used platform
+                  </label>
+                  <div class="field__control field__control--select">
+                    <select id="most_used_platform" name="most_used_platform">
+                      <option value="" disabled selected>Select…</option>
+                      <option>Facebook</option><option>LinkedIn</option><option>Instagram</option>
+                      <option>Snapchat</option><option>Twitter</option><option>YouTube</option>
+                      <option>TikTok</option><option>LINE</option><option>KakaoTalk</option>
+                      <option>VKontakte</option><option>WhatsApp</option><option>WeChat</option>
+                    </select>
+                  </div>
+                  <p class="field__error" id="most_used_platform-error" role="alert" hidden></p>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="purpose_of_use">
+                    <span class="field__icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="4.4"/><circle cx="12" cy="12" r="0.8" fill="currentColor"/></svg></span>
+                    Purpose of use
+                  </label>
+                  <div class="field__control field__control--select">
+                    <select id="purpose_of_use" name="purpose_of_use">
+                      <option value="" disabled selected>Select…</option>
+                      <option>Networking</option><option>Education</option>
+                      <option>Entertainment</option><option>News</option>
+                    </select>
+                  </div>
+                  <p class="field__error" id="purpose_of_use-error" role="alert" hidden></p>
+                </div>
+
+                <div class="field field--wide">
+                  <div class="slider__top">
+                    <label class="field__label" for="avg_daily_usage_hours">
+                      <span class="field__icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.2"/><path d="M10.5 18.5h3"/></svg></span>
+                      Average daily usage
+                    </label>
+                    <span class="slider__value mono-figure" id="usageValue">6 hrs / day</span>
+                  </div>
+                  <input type="range" id="avg_daily_usage_hours" name="avg_daily_usage_hours" min="6" max="24" step="0.5" value="6" class="slider__input" />
+                  <div class="slider__scale"><span>6</span><span>24</span></div>
+                  <p class="field__error" id="avg_daily_usage_hours-error" role="alert" hidden></p>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="daily_unlocks">
+                    <span class="field__icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="9" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 7.6-1.8"/></svg></span>
+                    Daily unlocks
+                  </label>
+                  <div class="field__control">
+                    <input type="number" id="daily_unlocks" name="daily_unlocks" min="0" placeholder="e.g. 50" />
+                    <span class="field__suffix">unlocks</span>
+                  </div>
+                  <p class="field__error" id="daily_unlocks-error" role="alert" hidden></p>
+                </div>
+
+              </div>
+            </section>
+
+            <!-- Step 3: Lifestyle & Wellbeing -->
+            <section class="form-section" id="step3" data-step="3" hidden>
+              <div class="form-section__head">
+                <p class="form-section__eyebrow">Step 3 of 3</p>
+                <h2 class="form-section__title">Lifestyle & wellbeing</h2>
+                <p class="form-section__desc">The rhythm of your days outside of screens.</p>
+              </div>
+              <div class="form-section__grid">
+
+                <div class="field">
+                  <label class="field__label" for="study_hours">
+                    <span class="field__icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.2c2.3-1 5-1.2 8 0v13.6c-3-1.2-5.7-1-8 0V5.2Z"/><path d="M20 5.2c-2.3-1-5-1.2-8 0v13.6c3-1.2 5.7-1 8 0V5.2Z"/></svg></span>
+                    Study hours
+                  </label>
+                  <div class="field__control">
+                    <input type="number" id="study_hours" name="study_hours" min="0" max="24" step="0.5" placeholder="e.g. 5" />
+                    <span class="field__suffix">hrs/day</span>
+                  </div>
+                  <p class="field__error" id="study_hours-error" role="alert" hidden></p>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="physical_activity_hours">
+                    <span class="field__icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.2-7 4 14 2.2-7H21"/></svg></span>
+                    Physical activity
+                  </label>
+                  <div class="field__control">
+                    <input type="number" id="physical_activity_hours" name="physical_activity_hours" min="0" max="24" step="0.5" placeholder="e.g. 1" />
+                    <span class="field__suffix">hrs/day</span>
+                  </div>
+                  <p class="field__error" id="physical_activity_hours-error" role="alert" hidden></p>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="sleep_hours_per_night">
+                    <span class="field__icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.2A8.5 8.5 0 1 1 9.8 4a6.7 6.7 0 0 0 10.2 10.2Z"/></svg></span>
+                    Sleep per night
+                  </label>
+                  <div class="field__control">
+                    <input type="number" id="sleep_hours_per_night" name="sleep_hours_per_night" min="0" max="24" step="0.5" placeholder="e.g. 7" />
+                    <span class="field__suffix">hrs</span>
+                  </div>
+                  <p class="field__error" id="sleep_hours_per_night-error" role="alert" hidden></p>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="stress_level">
+                    <span class="field__icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h3.2l1.6-4.5 3 9 2.2-6.5 1.4 2h4.6"/><circle cx="12" cy="12" r="9.2"/></svg></span>
+                    Stress level
+                  </label>
+                  <div class="field__control field__control--select">
+                    <select id="stress_level" name="stress_level">
+                      <option value="" disabled selected>Select…</option>
+                      <option>Low</option><option>Medium</option><option>High</option><option>Very High</option>
+                    </select>
+                  </div>
+                  <p class="field__error" id="stress_level-error" role="alert" hidden></p>
+                </div>
+
+              </div>
+            </section>
+
+            <div class="wizard-card__nav" id="wizardNav">
+              <button type="button" class="btn btn--ghost" id="backBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg>
+                Back
+              </button>
+              <button type="button" class="btn btn--primary" id="continueBtn">
+                Continue
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+              </button>
+              <button type="button" class="btn btn--primary btn--lg predict-btn" id="predictBtn" hidden>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c.6 3.6 2.1 5.4 6 6-3.9.6-5.4 2.4-6 6-.6-3.6-2.1-5.4-6-6 3.9-.6 5.4-2.4 6-6Z"/></svg>
+                Predict Mental Health Score
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- ---------- Error panel ---------- -->
+        <div class="wizard-card" id="errorCard" hidden>
+          <div class="error-panel" role="alert">
+            <span class="error-panel__icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21.5 20h-19L12 3.5Z"/><path d="M12 10v4.2"/><circle cx="12" cy="17.3" r="0.9" fill="currentColor"/></svg>
+            </span>
+            <h2 class="error-panel__title" id="errorTitle"></h2>
+            <p class="error-panel__subtitle" id="errorSubtitle"></p>
+            <button type="button" class="btn btn--secondary" id="retryBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-1.6 4.8"/><path d="M20 5.5V11h-5.5"/></svg>
+              Try again
+            </button>
+          </div>
+        </div>
+
+        <!-- ---------- Result stack ---------- -->
+        <div class="result-stack" id="resultStack" hidden>
+
+          <div class="result-card">
+            <canvas class="result-card__field" id="resultField" aria-hidden="true"></canvas>
+            <p class="result-card__eyebrow">Your Predicted Mental Health Score</p>
+            <div class="gauge">
+              <svg viewBox="0 0 200 200" class="gauge__svg" role="img" id="gaugeSvg">
+                <circle cx="100" cy="100" r="84" class="gauge__track"></circle>
+                <circle cx="100" cy="100" r="84" class="gauge__progress" id="gaugeProgress"></circle>
+              </svg>
+              <div class="gauge__center">
+                <span class="gauge__score mono-figure" id="gaugeScore">–</span>
+                <span class="gauge__label">Predicted score</span>
+              </div>
+            </div>
+            <p class="result-card__footnote">Prediction generated by your machine-learning model</p>
+          </div>
+
+          <div class="summary-card">
+            <h3 class="summary-card__title">Your Assessment</h3>
+            <dl class="summary-card__grid" id="summaryGrid"></dl>
+          </div>
+
+          <div class="disclaimer" role="note">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.2"/><circle cx="12" cy="8" r="0.9" fill="currentColor"/></svg>
+            <p><strong>Disclaimer:</strong> This tool provides a machine-learning-based prediction for educational/research purposes and is not a medical diagnosis or a substitute for professional mental-health advice.</p>
+          </div>
+
+          <button type="button" class="btn btn--secondary btn--lg" id="predictAgainBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-1.6 4.8"/><path d="M20 5.5V11h-5.5"/></svg>
+            Predict again
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+
+    <footer class="app__footer">
+      <div class="container app__footer-inner">
+        <span>Mental Health Score Predictor</span>
+        <span>Built for educational &amp; research use</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
