@@ -9,7 +9,7 @@
 // 1. API configuration — the ONLY place the backend URL is defined.
 //    Change this to match where your FastAPI server is running.
 // ---------------------------------------------------------------------------
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "https://mental-health-score-prediction-vefa.onrender.com";
 const PREDICT_ENDPOINT = `${API_BASE_URL}/predict`;
 
 // ---------------------------------------------------------------------------
